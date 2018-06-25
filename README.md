@@ -53,8 +53,8 @@ I downloaded [`spline.h`](http://kluge.in-chemnitz.de/opensource/spline/) accord
 ### Valid Trajectories
 The car is able to drive without any incidents for at least 4.32 miles. I made a [`video`](https://www.youtube.com/watch?v=4fXXjHxP1uE) on YouTube. Below are the screenshots while the ego vehicle was driving.
 
-[!Ego Vehicle Driving 1](image.png)
-[!Ego Vehicle Driving 2](image2.png)
+![Ego Vehicle Driving 1](image.png)
+![Ego Vehicle Driving 2](image2.png)
 
 The criteria include the following:
 1. The car drives according to the speed limit.
