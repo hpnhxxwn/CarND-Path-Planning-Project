@@ -21,49 +21,6 @@ The highway's waypoints loop around so the frenet s value, distance along the ro
 
 Here is the data provided from the Simulator to the C++ Program
 
-#### Main car's localization Data (No Noise)
-
-["x"] The car's x position in map coordinates
-
-["y"] The car's y position in map coordinates
-
-["s"] The car's s position in frenet coordinates
-
-["d"] The car's d position in frenet coordinates
-
-["yaw"] The car's yaw angle in the map
-
-["speed"] The car's speed in MPH
-
-#### Previous path data given to the Planner
-
-//Note: Return the previous list but with processed points removed, can be a nice tool to show how far along
-the path has processed since last time. 
-
-["previous_path_x"] The previous list of x points previously given to the simulator
-
-["previous_path_y"] The previous list of y points previously given to the simulator
-
-#### Previous path's end s and d values 
-
-["end_path_s"] The previous list's last point's frenet s value
-
-["end_path_d"] The previous list's last point's frenet d value
-
-#### Sensor Fusion Data, a list of all other car's attributes on the same side of the road. (No Noise)
-
-["sensor_fusion"] A 2d vector of cars and then that car's [car's unique ID, car's x position in map coordinates, car's y position in map coordinates, car's x velocity in m/s, car's y velocity in m/s, car's s position in frenet coordinates, car's d position in frenet coordinates. 
-
-## Details
-
-1. The car uses a perfect controller and will visit every (x,y) point it recieves in the list every .02 seconds. The units for the (x,y) points are in meters and the spacing of the points determines the speed of the car. The vector going from a point to the next point in the list dictates the angle of the car. Acceleration both in the tangential and normal directions is measured along with the jerk, the rate of change of total Acceleration. The (x,y) point paths that the planner recieves should not have a total acceleration that goes over 10 m/s^2, also the jerk should not go over 50 m/s^3. (NOTE: As this is BETA, these requirements might change. Also currently jerk is over a .02 second interval, it would probably be better to average total acceleration over 1 second and measure jerk from that.
-
-2. There will be some latency between the simulator running and the path planner returning a path, with optimized code usually its not very long maybe just 1-3 time steps. During this delay the simulator will continue using points that it was last given, because of this its a good idea to store the last points you have used so you can have a smooth transition. previous_path_x, and previous_path_y can be helpful for this transition since they show the last points given to the simulator controller with the processed points already removed. You would either return a path that extends this previous path or make sure to create a new path that has a smooth transition with this last path.
-
-## Tips
-
-A really helpful resource for doing this project and creating smooth trajectories was using http://kluge.in-chemnitz.de/opensource/spline/, the spline function is in a single hearder file is really easy to use.
-
 ---
 
 ## Dependencies
@@ -87,54 +44,38 @@ A really helpful resource for doing this project and creating smooth trajectorie
     git checkout e94b6e1
     ```
 
-## Editor Settings
 
-We've purposefully kept editor configuration files out of this repo in order to
-keep it as simple and environment agnostic as possible. However, we recommend
-using the following settings:
+## Rubric
 
-* indent using spaces
-* set tab width to 2 spaces (keeps the matrices in source code aligned)
+### Compilation
+I downloaded [`spline.h`](http://kluge.in-chemnitz.de/opensource/spline/) according to the QA session and put it to `src` folder. The compilation went through.
 
-## Code Style
+### Valid Trajectories
+The car is able to drive without any incidents for at least 4.32 miles. I made a [`video`](https://www.youtube.com/watch?v=4fXXjHxP1uE) on YouTube. Below are the screenshots while the ego vehicle was driving.
 
-Please (do your best to) stick to [Google's C++ style guide](https://google.github.io/styleguide/cppguide.html).
+[!Ego Vehicle Driving 1](image.png)
+[!Ego Vehicle Driving 2](image2.png)
 
-## Project Instructions and Rubric
+The criteria include the following:
+1. The car drives according to the speed limit.
+    * No speed limit reg flag was seen.
+2. Max Acceleration and Jerk are not Exceeded.
+    * No max jerk red flag was seen.
+3. Car does not have collisions.
+    * No collision red flag was seen.
+4. The car stays in its lane, except for the time between changing lanes.
+    * Most of time the car stays in its lane unless there is a car ahead of it, or need to merge onto the center lane.
+5. The car is able to change lanes
+    * The car is able to change lane when there is a slower car ahead of it and no traffic around, or needs to change back to center lane if and only if there is no traffic around.
 
-Note: regardless of the changes you make, your project must be buildable using
-cmake and make!
+### Reflection
+The starter code is leveraged from the QA session. The algorithm starts from line 245 of [`main.cpp`](src/main.cpp#L245).
 
+From line 245-289 I implemented the code to determine whether there is a car ahead of the ego car, left to the car or right to the car. The condition is met if the distance measured from the sensors is within 30m from the ego car.
 
-## Call for IDE Profiles Pull Requests
+Line 291-314 decides whether the car needs to change lane. There are two conditions below and if either one is met the car changes lane.
+1. There is a slower car ahead and there is no left/right car within 30m.
+2. The car is on the left/right lane and wants to change back to the center lane, and there is no cars on the direction it wants to merge on.
+Line 310-313 is used when the car is about to start. This is to avoid the high jerk when the car starts to reach the max speed.
 
-Help your fellow students!
-
-We decided to create Makefiles with cmake to keep this project as platform
-agnostic as possible. Similarly, we omitted IDE profiles in order to ensure
-that students don't feel pressured to use one IDE or another.
-
-However! I'd love to help people get up and running with their IDEs of choice.
-If you've created a profile for an IDE that you think other students would
-appreciate, we'd love to have you add the requisite profile files and
-instructions to ide_profiles/. For example if you wanted to add a VS Code
-profile, you'd add:
-
-* /ide_profiles/vscode/.vscode
-* /ide_profiles/vscode/README.md
-
-The README should explain what the profile does, how to take advantage of it,
-and how to install it.
-
-Frankly, I've never been involved in a project with multiple IDE profiles
-before. I believe the best way to handle this would be to keep them out of the
-repo root to avoid clutter. My expectation is that most profiles will include
-instructions to copy files to a new location to get picked up by the IDE, but
-that's just a guess.
-
-One last note here: regardless of the IDE used, every submitted project must
-still be compilable with cmake and make./
-
-## How to write a README
-A well written README file can enhance your project and portfolio.  Develop your abilities to create professional README files by completing [this free course](https://www.udacity.com/course/writing-readmes--ud777).
-
+Line 321-420 calculate the trajectory points. The car orientation is calculated from the last two points of the previous path points. Then there are three points at farther distances are included for the spline calculation.
